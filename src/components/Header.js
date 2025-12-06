@@ -56,12 +56,12 @@ export default function Header() {
   const isDark = theme === 'dark';
 
   return (
-    <header className={`w-full border-b px-6 py-4 ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <header className={`w-full border-b px-3 sm:px-4 md:px-6 py-3 sm:py-4 ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <svg
-              className="h-6 w-6 text-green-500"
+              className="h-5 w-5 sm:h-6 sm:w-6 text-green-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -73,18 +73,18 @@ export default function Header() {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Finance Dashboard</h1>
+            <h1 className={`text-lg sm:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Finance Dashboard</h1>
           </div>
-          <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <div className={`text-xs sm:text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} hidden sm:block`}>
             {activeWidgetsCount} active widget{activeWidgetsCount !== 1 ? 's' : ''} - Real-time data
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto">
           {/* Theme Toggle */}
           <button
             onClick={handleThemeToggle}
-            className={`rounded-lg px-4 py-2 text-sm ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+            className={`rounded-lg px-3 sm:px-4 py-2 text-sm ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
@@ -100,7 +100,7 @@ export default function Header() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className={`rounded-lg px-4 py-2 text-sm ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+            className={`rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'} hidden sm:inline-flex items-center`}
           >
             Import JSON
           </button>
@@ -108,7 +108,7 @@ export default function Header() {
           {/* Export JSON */}
           <button
             onClick={handleExport}
-            className={`rounded-lg px-4 py-2 text-sm ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+            className={`rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'} hidden sm:inline-flex items-center`}
           >
             Export JSON
           </button>
@@ -116,7 +116,7 @@ export default function Header() {
           {/* Add Widget Button */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
+            className="flex items-center gap-2 rounded-lg bg-green-600 px-3 sm:px-4 py-2 text-xs sm:text-sm text-white hover:bg-green-700 flex-1 sm:flex-initial"
           >
             <svg
               className="h-4 w-4"

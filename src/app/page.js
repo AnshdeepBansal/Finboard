@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <Header />
-      <main className="container mx-auto p-6">
+      <main className="container mx-auto p-3 sm:p-4 md:p-6">
         <WidgetGrid />
       </main>
     </div>

@@ -265,14 +265,15 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-4xl max-h-[90vh] rounded-lg bg-gray-800 p-6 text-white shadow-xl overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 overflow-y-auto">
+      <div className="w-full min-h-full bg-gray-800 p-4 sm:p-6 md:p-8 text-white">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Add New Widget</h2>
+        <div className="mb-4 sm:mb-6 flex items-center justify-between max-w-7xl mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold">{editingWidget ? 'Edit Widget' : 'Add New Widget'}</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 hover:text-white p-2 -mr-2"
+            aria-label="Close modal"
           >
             <svg
               className="h-6 w-6"
@@ -289,7 +290,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
             </svg>
           </button>
         </div>
-
+        <div className="max-w-7xl mx-auto">
         {/* Widget Name */}
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium">Widget Name</label>
@@ -305,18 +306,18 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
         {/* API URL */}
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium">API URL</label>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={apiUrl}
               onChange={(e) => setApiUrl(e.target.value)}
-              className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
               placeholder="https://api.example.com/data"
             />
             <button
               onClick={handleTestApi}
               disabled={isLoading}
-              className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50 whitespace-nowrap text-sm sm:text-base"
             >
               <svg
                 className="h-4 w-4"
@@ -402,7 +403,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
           ) : (
             <div className="space-y-2">
               {headers.map((header, index) => (
-              <div key={index} className="flex gap-2">
+              <div key={index} className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={header.key}
@@ -412,7 +413,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
                     setHeaders(newHeaders);
                   }}
                   placeholder="Header Key (e.g., Authorization)"
-                  className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                 />
                 <input
                   type="text"
@@ -423,7 +424,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
                     setHeaders(newHeaders);
                   }}
                   placeholder="Header Value (e.g., Bearer token123)"
-                  className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                 />
                 <button
                   type="button"
@@ -431,7 +432,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
                     const newHeaders = headers.filter((_, i) => i !== index);
                     setHeaders(newHeaders);
                   }}
-                  className="rounded-lg bg-red-600 px-3 py-2 text-white hover:bg-red-700"
+                  className="rounded-lg bg-red-600 px-3 py-2 text-white hover:bg-red-700 sm:flex-shrink-0"
                   title="Remove header"
                 >
                   ×
@@ -464,12 +465,12 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
           <label className="mb-2 block text-sm font-medium">
             Select Fields to Display
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {['card', 'table', 'chart'].map((mode) => (
               <button
                 key={mode}
                 onClick={() => setDisplayMode(mode)}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 capitalize ${
+                className={`flex items-center gap-2 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base capitalize ${
                   displayMode === mode
                     ? 'bg-green-600 text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -523,13 +524,13 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
               className="mb-4 w-full rounded-lg bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Available Fields */}
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Available Fields
                 </label>
-                <div className="h-64 overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-2">
+                <div className="h-48 sm:h-64 overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-2">
                   {filteredFields.length === 0 ? (
                     <div className="p-4 text-center text-gray-400">
                       No fields found
@@ -566,7 +567,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
                 <label className="mb-2 block text-sm font-medium">
                   Selected Fields
                 </label>
-                <div className="h-64 overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-2">
+                <div className="h-48 sm:h-64 overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-2">
                   {selectedFields.length === 0 ? (
                     <div className="p-4 text-center text-gray-400">
                       No fields selected
@@ -638,17 +639,17 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
         )}
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 mt-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
           <button
             onClick={handleClose}
-            className="rounded-lg bg-gray-700 px-6 py-2 text-white hover:bg-gray-600"
+            className="rounded-lg bg-gray-700 px-4 sm:px-6 py-2 text-white hover:bg-gray-600 order-2 sm:order-1"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!widgetName.trim() || !apiUrl.trim() || !testStatus?.success}
-            className="rounded-lg bg-green-600 px-6 py-2 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-lg bg-green-600 px-4 sm:px-6 py-2 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
             title={
               !widgetName.trim() 
                 ? 'Widget name is required'
@@ -661,6 +662,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
           >
             {editingWidget ? 'Update Widget' : 'Add Widget'}
           </button>
+        </div>
         </div>
       </div>
     </div>

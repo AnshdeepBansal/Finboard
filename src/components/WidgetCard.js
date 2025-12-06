@@ -103,17 +103,11 @@ export default function WidgetCard({ widget, onEdit }) {
     setShowMenu(false);
   };
 
-  const handleConfigure = (e) => {
-    e?.stopPropagation();
-    // Same as edit for now
-    handleEdit();
-  };
-
   const renderContent = () => {
     if (loading && !data) {
       return (
-        <div className="flex h-64 items-center justify-center">
-          <div className="text-gray-400">Loading...</div>
+        <div className="flex h-48 sm:h-64 items-center justify-center">
+          <div className="text-gray-400 text-sm sm:text-base">Loading...</div>
         </div>
       );
     }
@@ -158,10 +152,10 @@ export default function WidgetCard({ widget, onEdit }) {
     <>
       <div className="h-full w-full rounded-lg bg-gray-800 text-white shadow-lg overflow-visible">
         {/* Title Bar */}
-        <div className="flex items-center justify-between border-b border-gray-700 px-4 py-3 relative overflow-visible">
-          <div className="flex items-center gap-3 react-draggable-handle" style={{ cursor: 'move', flex: 1 }}>
-            <h3 className="font-semibold">{widget.widgetName}</h3>
-            <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300">
+        <div className="flex items-center justify-between border-b border-gray-700 px-2 sm:px-3 md:px-4 py-2 sm:py-3 relative overflow-visible">
+          <div className="flex items-center gap-2 sm:gap-3 react-draggable-handle" style={{ cursor: 'move', flex: 1, minWidth: 0 }}>
+            <h3 className="font-semibold text-sm sm:text-base truncate">{widget.widgetName}</h3>
+            <span className="rounded bg-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs text-gray-300 flex-shrink-0">
               {widget.refreshInterval}s
             </span>
           </div>
@@ -210,21 +204,14 @@ export default function WidgetCard({ widget, onEdit }) {
                 <button
                   type="button"
                   onClick={handleEdit}
-                  className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 rounded-t-lg"
+                  className="w-full px-3 sm:px-4 py-2 text-left text-xs sm:text-sm text-white hover:bg-gray-600 rounded-t-lg"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
-                  onClick={handleConfigure}
-                  className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600"
-                >
-                  Configure
-                </button>
-                <button
-                  type="button"
                   onClick={handleDelete}
-                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-600 rounded-b-lg"
+                  className="w-full px-3 sm:px-4 py-2 text-left text-xs sm:text-sm text-red-400 hover:bg-gray-600 rounded-b-lg"
                 >
                   Delete
                 </button>
@@ -236,14 +223,14 @@ export default function WidgetCard({ widget, onEdit }) {
         {/* Content */}
         <div className="h-[calc(100%-60px)] overflow-auto">
           {error && !loading && (
-            <div className="p-4 text-center text-red-400">{error}</div>
+            <div className="p-3 sm:p-4 text-center text-red-400 text-sm sm:text-base">{error}</div>
           )}
           {renderContent()}
         </div>
 
         {/* Last Updated */}
         {lastUpdated && (
-          <div className="border-t border-gray-700 px-4 py-2 text-center text-xs text-gray-400">
+          <div className="border-t border-gray-700 px-2 sm:px-4 py-1.5 sm:py-2 text-center text-xs text-gray-400">
             Last updated: {lastUpdated.toLocaleTimeString()}
           </div>
         )}

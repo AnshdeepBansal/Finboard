@@ -4,6 +4,13 @@
   transition: height 200ms ease;
 }
 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .react-grid-layout {
+    margin: 0 -8px;
+  }
+}
+
 .react-grid-layout > div {
   transition: all 200ms ease;
   transition-property: left, top, width, height;
