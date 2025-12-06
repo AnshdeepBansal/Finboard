@@ -28,8 +28,39 @@ export async function GET(request) {
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
+      
+      // Handle rate limiting specifically
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('retry-after');
+        return NextResponse.json(
+          { 
+            error: 'Rate limit exceeded. Please try again later.',
+            details: errorText,
+            retryAfter: retryAfter ? parseInt(retryAfter, 10) : null,
+          },
+          { 
+            status: 429,
+            headers: {
+              'Retry-After': retryAfter || '60',
+            },
+          }
+        );
+      }
+      
+      // Handle other errors with better messages
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      if (response.status === 401) {
+        errorMessage = 'Authentication failed. Please check your API credentials.';
+      } else if (response.status === 403) {
+        errorMessage = 'Access forbidden. You may not have permission to access this resource.';
+      } else if (response.status === 404) {
+        errorMessage = 'API endpoint not found. Please check the URL.';
+      } else if (response.status >= 500) {
+        errorMessage = 'Server error. The API is temporarily unavailable.';
+      }
+      
       return NextResponse.json(
-        { error: `HTTP error! status: ${response.status}`, details: errorText },
+        { error: errorMessage, details: errorText },
         { status: response.status }
       );
     }
@@ -95,8 +126,39 @@ export async function POST(request) {
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
+      
+      // Handle rate limiting specifically
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('retry-after');
+        return NextResponse.json(
+          { 
+            error: 'Rate limit exceeded. Please try again later.',
+            details: errorText,
+            retryAfter: retryAfter ? parseInt(retryAfter, 10) : null,
+          },
+          { 
+            status: 429,
+            headers: {
+              'Retry-After': retryAfter || '60',
+            },
+          }
+        );
+      }
+      
+      // Handle other errors with better messages
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      if (response.status === 401) {
+        errorMessage = 'Authentication failed. Please check your API credentials.';
+      } else if (response.status === 403) {
+        errorMessage = 'Access forbidden. You may not have permission to access this resource.';
+      } else if (response.status === 404) {
+        errorMessage = 'API endpoint not found. Please check the URL.';
+      } else if (response.status >= 500) {
+        errorMessage = 'Server error. The API is temporarily unavailable.';
+      }
+      
       return NextResponse.json(
-        { error: `HTTP error! status: ${response.status}`, details: errorText },
+        { error: errorMessage, details: errorText },
         { status: response.status }
       );
     }

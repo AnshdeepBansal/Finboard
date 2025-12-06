@@ -8,6 +8,7 @@ import { parseApi } from '@/lib/parseApi';
 import { detectApiType } from '@/lib/detectApiType';
 import useWidgetStore from '@/store/widgetStore';
 import AddWidgetModal from './AddWidgetModal';
+import { fetchApiData } from '@/lib/apiClient';
 
 export default function WidgetCard({ widget, onEdit }) {
   const { deleteWidget } = useWidgetStore();
@@ -15,9 +16,12 @@ export default function WidgetCard({ widget, onEdit }) {
   const [rawData, setRawData] = useState(null); // Store raw API response for table rendering
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [errorType, setErrorType] = useState(null);
+  const [retryAfter, setRetryAfter] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isFromCache, setIsFromCache] = useState(false);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -39,9 +43,12 @@ export default function WidgetCard({ widget, onEdit }) {
     }
   }, [showMenu]);
 
-  const fetchData = async () => {
+  const fetchData = async (skipCache = false) => {
     setLoading(true);
     setError(null);
+    setErrorType(null);
+    setRetryAfter(null);
+    setIsFromCache(false);
 
     try {
       // Build headers object from widget headers
@@ -54,26 +61,34 @@ export default function WidgetCard({ widget, onEdit }) {
         });
       }
 
-      // Use proxy endpoint to bypass CORS
-      const proxyUrl = `/api/proxy?url=${encodeURIComponent(widget.apiUrl)}`;
-      const headersParam = Object.keys(headersObj).length > 0 
-        ? `&headers=${encodeURIComponent(JSON.stringify(headersObj))}`
-        : '';
+      // Use API client with caching and error handling
+      const result = await fetchApiData(widget.apiUrl, {
+        headers: headersObj,
+        cacheTTL: widget.refreshInterval * 1000, // Use refresh interval as cache TTL
+        skipCache,
+      });
 
-      const response = await fetch(proxyUrl + headersParam);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      if (result.error) {
+        setError(result.error.message);
+        setErrorType(result.error.type);
+        setRetryAfter(result.error.retryAfter);
+        setData({ error: result.error.message });
+        setLoading(false);
+        return;
       }
-      const jsonData = await response.json();
-      const apiType = detectApiType(jsonData);
-      const parsedData = parseApi(jsonData, apiType, widget.selectedFields);
-      setData(parsedData);
-      // Store raw data for table renderer to access nested paths
-      setRawData(jsonData);
-      setLastUpdated(new Date());
+
+      if (result.data) {
+        const apiType = detectApiType(result.data);
+        const parsedData = parseApi(result.data, apiType, widget.selectedFields);
+        setData(parsedData);
+        // Store raw data for table renderer to access nested paths
+        setRawData(result.data);
+        setIsFromCache(result.fromCache);
+        setLastUpdated(new Date());
+      }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'An unexpected error occurred');
+      setErrorType('unknown_error');
       setData({ error: err.message });
     } finally {
       setLoading(false);
@@ -223,7 +238,49 @@ export default function WidgetCard({ widget, onEdit }) {
         {/* Content */}
         <div className="h-[calc(100%-60px)] overflow-auto">
           {error && !loading && (
-            <div className="p-3 sm:p-4 text-center text-red-400 text-sm sm:text-base">{error}</div>
+            <div className="p-3 sm:p-4">
+              <div className={`rounded-lg p-3 sm:p-4 ${
+                errorType === 'rate_limit' 
+                  ? 'bg-yellow-900/30 border border-yellow-700/50' 
+                  : errorType === 'auth_error' || errorType === 'permission_error'
+                  ? 'bg-orange-900/30 border border-orange-700/50'
+                  : 'bg-red-900/30 border border-red-700/50'
+              }`}>
+                <div className="flex items-start gap-2">
+                  <svg 
+                    className="h-5 w-5 flex-shrink-0 mt-0.5" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                  >
+                    {errorType === 'rate_limit' ? (
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    ) : (
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    )}
+                  </svg>
+                  <div className="flex-1">
+                    <p className={`text-sm sm:text-base font-medium ${
+                      errorType === 'rate_limit' ? 'text-yellow-300' : 'text-red-300'
+                    }`}>
+                      {error}
+                    </p>
+                    {retryAfter && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        Retry after {Math.ceil(retryAfter / 1000)} seconds
+                      </p>
+                    )}
+                    {errorType === 'rate_limit' && (
+                      <button
+                        onClick={() => fetchData(true)}
+                        className="mt-2 text-xs text-yellow-300 hover:text-yellow-200 underline"
+                      >
+                        Retry now
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
           {renderContent()}
         </div>
@@ -232,6 +289,9 @@ export default function WidgetCard({ widget, onEdit }) {
         {lastUpdated && (
           <div className="border-t border-gray-700 px-2 sm:px-4 py-1.5 sm:py-2 text-center text-xs text-gray-400">
             Last updated: {lastUpdated.toLocaleTimeString()}
+            {isFromCache && (
+              <span className="ml-2 text-gray-500">(cached)</span>
+            )}
           </div>
         )}
       </div>

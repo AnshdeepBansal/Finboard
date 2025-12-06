@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { detectApiType } from '@/lib/detectApiType';
 import { extractJsonPaths, getValueByPath } from '@/lib/extractJsonPaths';
 import useWidgetStore from '@/store/widgetStore';
+import { fetchApiData } from '@/lib/apiClient';
 
 export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }) {
   const { addWidget, updateWidget, widgets } = useWidgetStore();
@@ -74,25 +75,45 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
       // Build headers object from key-value pairs
       const headersObj = {};
       headers.forEach((header) => {
-        if (header.key.trim()) {
-          headersObj[header.key.trim()] = header.value.trim();
+        if (header.key && header.key.trim()) {
+          headersObj[header.key.trim()] = header.value?.trim() || '';
         }
       });
 
-      // Use proxy endpoint to bypass CORS
-      const proxyUrl = `/api/proxy?url=${encodeURIComponent(apiUrl)}`;
-      const headersParam = Object.keys(headersObj).length > 0 
-        ? `&headers=${encodeURIComponent(JSON.stringify(headersObj))}`
-        : '';
+      // Use API client with caching and error handling
+      // Skip cache for testing to ensure fresh data
+      const result = await fetchApiData(apiUrl, {
+        headers: headersObj,
+        skipCache: true, // Always test with fresh data
+      });
 
-      const response = await fetch(proxyUrl + headersParam);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      if (result.error) {
+        let errorMessage = result.error.message;
+        if (result.error.retryAfter) {
+          errorMessage += ` (Retry after ${Math.ceil(result.error.retryAfter / 1000)} seconds)`;
+        }
+        setTestStatus({
+          success: false,
+          message: errorMessage,
+          errorType: result.error.type,
+        });
+        setApiData(null);
+        setAvailableFields([]);
+        return;
       }
-      const data = await response.json();
-      const detectedType = detectApiType(data);
-      const paths = extractJsonPaths(data);
+
+      if (!result.data) {
+        setTestStatus({
+          success: false,
+          message: 'No data received from API.',
+        });
+        setApiData(null);
+        setAvailableFields([]);
+        return;
+      }
+
+      const detectedType = detectApiType(result.data);
+      const paths = extractJsonPaths(result.data);
       const hasArrays = paths.some(p => p.type === 'array');
 
       // Accept any API that has at least one array (for tables) or any fields (for cards)
@@ -104,7 +125,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
         setApiData(null);
         setAvailableFields([]);
       } else {
-        setApiData(data);
+        setApiData(result.data);
         setApiType(detectedType);
         setAvailableFields(paths);
         const arrayCount = paths.filter(p => p.type === 'array').length;
@@ -119,7 +140,8 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
     } catch (error) {
       setTestStatus({
         success: false,
-        message: `Error: ${error.message}`,
+        message: `Error: ${error.message || 'An unexpected error occurred'}`,
+        errorType: 'unknown_error',
       });
       setApiData(null);
       setAvailableFields([]);
@@ -265,14 +287,14 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 overflow-y-auto flex items-center justify-center">
-      <div className="w-[50vw] h-[80vh] bg-gray-800 p-4 sm:p-6 md:p-8 text-white rounded-md">
+    <div className="fixed inset-0 z-50 bg-black/70 overflow-y-auto flex items-center justify-center">
+      <div className="md:w-[40vw] sm:w-[80vw] w-full lg:h-[85vh] h-full overflow-scroll bg-gray-800 p-4 sm:p-6 md:p-8 text-white rounded-xl">
         {/* Header */}
         <div className="mb-4 sm:mb-6 flex items-center justify-between max-w-7xl mx-auto">
           <h2 className="text-xl sm:text-2xl font-bold">{editingWidget ? 'Edit Widget' : 'Add New Widget'}</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white p-2 -mr-2"
+            className="text-gray-400 hover:text-white p-2 -mr-2 cursor-pointer"
             aria-label="Close modal"
           >
             <svg
@@ -337,16 +359,20 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
           </div>
           {testStatus && (
             <div
-              className={`mt-2 rounded-lg p-3 ${
+              className={`mt-2 rounded-lg p-3 border ${
                 testStatus.success
-                  ? 'bg-green-900 text-green-200'
-                  : 'bg-red-900 text-red-200'
+                  ? 'bg-green-900/30 text-green-200 border-green-700/50'
+                  : testStatus.errorType === 'rate_limit'
+                  ? 'bg-yellow-900/30 text-yellow-200 border-yellow-700/50'
+                  : testStatus.errorType === 'auth_error' || testStatus.errorType === 'permission_error'
+                  ? 'bg-orange-900/30 text-orange-200 border-orange-700/50'
+                  : 'bg-red-900/30 text-red-200 border-red-700/50'
               }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-start gap-2">
                 {testStatus.success ? (
                   <svg
-                    className="h-5 w-5"
+                    className="h-5 w-5 flex-shrink-0 mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -356,9 +382,21 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
                       clipRule="evenodd"
                     />
                   </svg>
+                ) : testStatus.errorType === 'rate_limit' ? (
+                  <svg
+                    className="h-5 w-5 flex-shrink-0 mt-0.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 ) : (
                   <svg
-                    className="h-5 w-5"
+                    className="h-5 w-5 flex-shrink-0 mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -369,7 +407,7 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
                     />
                   </svg>
                 )}
-                <span>{testStatus.message}</span>
+                <span className="flex-1">{testStatus.message}</span>
               </div>
             </div>
           )}

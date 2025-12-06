@@ -102,7 +102,7 @@ export default function Header() {
           {/* Theme Toggle */}
           <button
             onClick={handleThemeToggle}
-            className={`rounded-lg px-3 sm:px-4 py-2 text-sm font-medium transition-all hover:scale-105 ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+            className={`rounded-lg px-3 sm:px-4 py-2 cursor-pointer text-sm font-medium transition-all hover:scale-105 ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
             aria-label="Toggle theme"
           >
             <span className="text-base">{theme === 'dark' ? '☀️' : '🌙'}</span>
@@ -111,7 +111,7 @@ export default function Header() {
           {/* Add Widget Button */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-green-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-green-700 transition-all hover:scale-105 shadow-sm flex-1 sm:flex-initial justify-center"
+            className="flex items-center gap-2 cursor-pointer rounded-lg bg-green-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-green-700 transition-all hover:scale-105 shadow-sm flex-1 sm:flex-initial justify-center"
           >
             <svg
               className="h-4 w-4"
@@ -132,7 +132,7 @@ export default function Header() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`flex items-center gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+              className={`cursor-pointer flex items-center gap-2 rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
             >
               <svg
                 className="h-4 w-4"
@@ -175,10 +175,10 @@ export default function Header() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${isDark ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-900 hover:bg-gray-100'}`}
+                  className={`w-full flex items-center cursor-pointer gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${isDark ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-900 hover:bg-gray-100'}`}
                 >
                   <svg
-                    className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
+                    className="h-4 w-4 cursor-pointer sm:h-5 sm:w-5 flex-shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -194,10 +194,10 @@ export default function Header() {
                 </button>
                 <button
                   onClick={handleExport}
-                  className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors border-t ${isDark ? 'text-gray-200 hover:bg-gray-700 border-gray-700' : 'text-gray-900 hover:bg-gray-100 border-gray-200'}`}
+                  className={`w-full flex cursor-pointer items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors border-t ${isDark ? 'text-gray-200 hover:bg-gray-700 border-gray-700' : 'text-gray-900 hover:bg-gray-100 border-gray-200'}`}
                 >
                   <svg
-                    className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0"
+                    className="h-4 w-4 cursor-pointer sm:h-5 sm:w-5 flex-shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
