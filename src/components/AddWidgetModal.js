@@ -265,8 +265,8 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 overflow-y-auto ">
-      <div className="w-[50vw] min-h-full bg-gray-800 p-4 sm:p-6 md:p-8 text-white">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 overflow-y-auto flex items-center justify-center">
+      <div className="w-[50vw] h-[80vh] bg-gray-800 p-4 sm:p-6 md:p-8 text-white rounded-md">
         {/* Header */}
         <div className="mb-4 sm:mb-6 flex items-center justify-between max-w-7xl mx-auto">
           <h2 className="text-xl sm:text-2xl font-bold">{editingWidget ? 'Edit Widget' : 'Add New Widget'}</h2>
