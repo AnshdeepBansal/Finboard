@@ -6,7 +6,7 @@ import useWidgetStore from '@/store/widgetStore';
 const SAMPLE_DASHBOARD = {
   "widgets": [
     {
-      "widgetName": "Crypto",
+      "widgetName": "Sample 1",
       "apiUrl": "https://api.coinbase.com/v2/exchange-rates?currency=BTC",
       "refreshInterval": 30,
       "displayMode": "card",
@@ -20,7 +20,7 @@ const SAMPLE_DASHBOARD = {
       "id": "widget-1765012111102"
     },
     {
-      "widgetName": "Microsoft - monthly",
+      "widgetName": "Sample 2",
       "apiUrl": "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=MSFT&apikey=SLJ82MPLG5O6P1Q7",
       "refreshInterval": 30002,
       "displayMode": "chart",
@@ -35,7 +35,7 @@ const SAMPLE_DASHBOARD = {
       "id": "widget-1765013313861"
     },
     {
-      "widgetName": "top",
+      "widgetName": "Sample 3",
       "apiUrl": "https://stock.indianapi.in/trending",
       "refreshInterval": 3000,
       "displayMode": "table",
