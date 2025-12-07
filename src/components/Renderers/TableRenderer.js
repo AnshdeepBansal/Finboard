@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getValueByPath } from '@/lib/extractJsonPaths';
 
 export default function TableRenderer({ data, selectedFields, apiType }) {
@@ -153,7 +153,7 @@ export default function TableRenderer({ data, selectedFields, apiType }) {
   const paginatedData = processedData.slice(startIndex, endIndex);
 
   // Reset to page 1 when search or sort changes
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, sortConfig]);
 

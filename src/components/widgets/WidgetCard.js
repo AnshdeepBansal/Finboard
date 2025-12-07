@@ -7,7 +7,7 @@ import ChartRenderer from '@/components/Renderers/ChartRenderer';
 import { parseApi } from '@/lib/parseApi';
 import { detectApiType } from '@/lib/detectApiType';
 import useWidgetStore from '@/store/widgetStore';
-import AddWidgetModal from './AddWidgetModal';
+import AddWidgetModal from './AddWidgetModal/AddWidgetModal';
 import { fetchApiData } from '@/lib/apiClient';
 
 export default function WidgetCard({ widget, onEdit }) {
@@ -170,7 +170,7 @@ export default function WidgetCard({ widget, onEdit }) {
         <div className="flex items-center justify-between border-b border-gray-700 px-2 sm:px-3 md:px-4 py-2 sm:py-3 relative overflow-visible">
           <div className="flex items-center gap-2 sm:gap-3 react-draggable-handle" style={{ cursor: 'move', flex: 1, minWidth: 0 }}>
             <h3 className="font-semibold text-sm sm:text-base truncate">{widget.widgetName}</h3>
-            <span className="rounded bg-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs text-gray-300 flex-shrink-0">
+            <span className="rounded bg-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs text-gray-300 shrink">
               {widget.refreshInterval}s
             </span>
           </div>
@@ -248,7 +248,7 @@ export default function WidgetCard({ widget, onEdit }) {
               }`}>
                 <div className="flex items-start gap-2">
                   <svg 
-                    className="h-5 w-5 flex-shrink-0 mt-0.5" 
+                    className="h-5 w-5 shrink mt-0.5" 
                     fill="currentColor" 
                     viewBox="0 0 20 20"
                   >

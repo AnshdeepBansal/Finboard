@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import WidgetCard from './WidgetCard';
 import useWidgetStore from '@/store/widgetStore';
-import AddWidgetModal from './AddWidgetModal';
+import AddWidgetModal from './AddWidgetModal/AddWidgetModal';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

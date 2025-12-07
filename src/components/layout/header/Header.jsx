@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import useWidgetStore from '@/store/widgetStore';
 
-import AddWidgetModal from '@/components/widgets/AddWidgetModal';
+import AddWidgetModal from '@/components/widgets/AddWidgetModal/AddWidgetModal';
 import HeaderBrand from './HeaderBrand';
 import ThemeToggle from './ThemeToggle';
 import AddWidgetButton from './AddWidgetButton';
