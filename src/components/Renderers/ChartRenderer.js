@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -23,6 +23,44 @@ const TIME_SERIES_FIELDS = [
 
 export default function ChartRenderer({ data, selectedFields, apiType }) {
   const [activeFields, setActiveFields] = useState(['close']); // Default to close
+  // Prepare timeSeriesData & availableFields as hooks called unconditionally
+  const timeSeriesData = (data && data.data) || [];
+
+  const availableFields = useMemo(() => {
+    // If not time-series, return default TIME_SERIES_FIELDS shape
+    if (apiType !== 'time-series') return TIME_SERIES_FIELDS;
+    if (timeSeriesData.length === 0) return TIME_SERIES_FIELDS;
+    const firstItem = timeSeriesData[0];
+    return TIME_SERIES_FIELDS.filter(
+      (field) => firstItem && firstItem[field.key] !== undefined
+    );
+  }, [timeSeriesData, apiType]);
+
+  // Initialize activeFields with selectedFields prop (if provided) or default
+  useEffect(() => {
+    // Only run initialization logic for time-series data
+    if (apiType !== 'time-series') return (
+    <div className="p-4 text-center text-gray-400">
+      Chart view not available for this API type
+    </div>
+  );;
+
+    if (selectedFields && selectedFields.length > 0) {
+      const valid = selectedFields.filter((k) =>
+        availableFields.some((f) => f.key === k)
+      );
+      if (valid.length > 0) {
+        setActiveFields(valid);
+        return;
+      }
+    }
+
+    if ((!selectedFields || selectedFields.length === 0) && availableFields.length > 0) {
+      // Prefer 'close' when available
+      const preferClose = availableFields.some((f) => f.key === 'close') ? ['close'] : [availableFields[0].key];
+      setActiveFields((prev) => (prev && prev.length > 0 ? prev : preferClose));
+    }
+  }, [availableFields, selectedFields, apiType]);
 
   if (!data || data.error) {
     return (
@@ -31,27 +69,6 @@ export default function ChartRenderer({ data, selectedFields, apiType }) {
       </div>
     );
   }
-
-  if (apiType === 'time-series') {
-    const timeSeriesData = data.data || [];
-
-    // Determine available fields from the data
-    const availableFields = useMemo(() => {
-      if (timeSeriesData.length === 0) return TIME_SERIES_FIELDS;
-      
-      // Check which fields exist in the data
-      const firstItem = timeSeriesData[0];
-      return TIME_SERIES_FIELDS.filter(field => 
-        firstItem && firstItem[field.key] !== undefined
-      );
-    }, [timeSeriesData]);
-
-    // Initialize activeFields with available fields if not set
-    useMemo(() => {
-      if (activeFields.length === 0 && availableFields.length > 0) {
-        setActiveFields([availableFields[0].key]);
-      }
-    }, [availableFields]);
 
     // Toggle field selection
     const toggleField = (fieldKey) => {
@@ -145,12 +162,4 @@ export default function ChartRenderer({ data, selectedFields, apiType }) {
         </ResponsiveContainer>
       </div>
     );
-  }
-
-  // Generic chart renderer for other data types
-  return (
-    <div className="p-4 text-center text-gray-400">
-      Chart view not available for this API type
-    </div>
-  );
 }

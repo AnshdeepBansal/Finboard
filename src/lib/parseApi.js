@@ -12,24 +12,41 @@ export function parseApi(data, apiType, selectedFields = []) {
 
   if (apiType === 'time-series') {
     // Support Daily, Weekly, and Monthly time series
-    const timeSeries = 
-      data['Time Series (Daily)'] || 
-      data['Weekly Time Series'] || 
-      data['Monthly Time Series'] || 
+    const timeSeries =
+      data['Time Series (Daily)'] ||
+      data['Weekly Time Series'] ||
+      data['Monthly Time Series'] ||
       {};
     const dates = Object.keys(timeSeries).sort();
-    
+
+    // Determine which fields to include. If selectedFields provided, use those keys.
+    const allKeys = ['open', 'high', 'low', 'close', 'volume'];
+    const keysToInclude = (selectedFields && selectedFields.length > 0)
+      ? allKeys.filter(k => selectedFields.includes(k))
+      : allKeys;
+
     return {
       type: 'time-series',
       meta: data['Meta Data'] || {},
-      data: dates.map((date) => ({
-        date,
-        open: parseFloat(timeSeries[date]['1. open']) || 0,
-        high: parseFloat(timeSeries[date]['2. high']) || 0,
-        low: parseFloat(timeSeries[date]['3. low']) || 0,
-        close: parseFloat(timeSeries[date]['4. close']) || 0,
-        volume: parseFloat(timeSeries[date]['5. volume']) || 0,
-      })),
+      data: dates.map((date) => {
+        const item = { date };
+        if (keysToInclude.includes('open')) {
+          item.open = parseFloat(timeSeries[date]['1. open']) || 0;
+        }
+        if (keysToInclude.includes('high')) {
+          item.high = parseFloat(timeSeries[date]['2. high']) || 0;
+        }
+        if (keysToInclude.includes('low')) {
+          item.low = parseFloat(timeSeries[date]['3. low']) || 0;
+        }
+        if (keysToInclude.includes('close')) {
+          item.close = parseFloat(timeSeries[date]['4. close']) || 0;
+        }
+        if (keysToInclude.includes('volume')) {
+          item.volume = parseFloat(timeSeries[date]['5. volume']) || 0;
+        }
+        return item;
+      }),
     };
   }
 

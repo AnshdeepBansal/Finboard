@@ -1,16 +1,27 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState,useEffect } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import WidgetCard from './WidgetCard';
 import useWidgetStore from '@/store/widgetStore';
 import AddWidgetModal from './AddWidgetModal/AddWidgetModal';
+import WelcomeWidget from './WelcomeWidget';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export default function WidgetGrid() {
   const { widgets, layout, setLayout } = useWidgetStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  
+  // Show welcome widget on first load (when no widgets and not yet dismissed)
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('dashboard-welcome-seen');
+    if (widgets.length === 0 && !hasSeenWelcome) {
+      setShowWelcome(true);
+    }
+  }, [widgets.length]);
+
 
   // Generate responsive layouts for different breakpoints
   const generateLayoutForBreakpoint = (widgets, cols, existingLayout = null) => {
@@ -90,6 +101,14 @@ export default function WidgetGrid() {
   if (widgets.length === 0) {
     return (
       <>
+      {showWelcome && (
+          <WelcomeWidget
+            onClose={() => {
+              localStorage.setItem('dashboard-welcome-seen', 'true');
+              setShowWelcome(false);
+            }}
+          />
+        )}
         <div className="flex items-center justify-center py-8 sm:py-12 md:py-16">
           <div
             onClick={() => setIsModalOpen(true)}

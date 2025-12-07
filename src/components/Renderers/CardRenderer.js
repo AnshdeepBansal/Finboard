@@ -59,11 +59,34 @@ export default function CardRenderer({ data, selectedFields, widgetName, apiType
     // Handle parsed data structure that wraps array in data property
     displayData = data.data[0];
   }
+  // Filter out fields that resolve to arrays — cards cannot represent arrays one-to-one
+  const displayableFields = selectedFields.filter((fieldPath) => {
+    let value;
+    if (fieldPath.startsWith('[0].')) {
+      const pathWithoutIndex = fieldPath.substring(4);
+      value = getValueByPath(displayData, pathWithoutIndex);
+    } else {
+      value = getValueByPath(displayData, fieldPath);
+    }
+
+    // If value resolves to an array, it's not displayable in card
+    if (Array.isArray(value)) return false;
+    return true;
+  });
+
+  if (!displayableFields || displayableFields.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-400">
+        <div className="mb-2">No displayable fields</div>
+        <div className="text-sm">Arrays cannot be rendered in Card view. Please select non-array fields.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">
       <div className="space-y-2">
-        {selectedFields.map((fieldPath, index) => {
+        {displayableFields.map((fieldPath, index) => {
           // Handle different path formats
           let value = undefined;
           
@@ -85,7 +108,6 @@ export default function CardRenderer({ data, selectedFields, widgetName, apiType
 
           const label = getFieldLabel(fieldPath);
           const displayValue = formatValue(value);
-
           return (
             <div
   key={index}

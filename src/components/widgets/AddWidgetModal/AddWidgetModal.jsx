@@ -294,7 +294,9 @@ export default function AddWidgetModal({ isOpen, onClose, editingWidget = null }
         <FieldSelector
           label="Display Mode"
           value={form.formData.displayMode}
-          onChange={(mode) => form.updateField('displayMode', mode)}
+          onChange={(mode) => {
+            form.updateField('displayMode', mode);
+          }}
         />
       </Section>
 

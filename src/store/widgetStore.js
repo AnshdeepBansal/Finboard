@@ -37,6 +37,14 @@ const useWidgetStore = create(
         }));
       },
 
+      //Delete all Widgets
+      deleteAllWidgets: () => {
+          set({
+            widgets: [],
+            layout: [],
+          });
+        },
+
       // Set layout for react-grid-layout
       setLayout: (layout) => {
         set({ layout });

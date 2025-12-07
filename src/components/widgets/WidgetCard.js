@@ -138,7 +138,7 @@ export default function WidgetCard({ widget, onEdit }) {
             data={cardData}
             selectedFields={widget.selectedFields}
             widgetName={widget.widgetName}
-            apiType={widget.widgetType}
+            apiType={data?.type || detectApiType(rawData)}
           />
         );
       case 'table':
@@ -147,7 +147,7 @@ export default function WidgetCard({ widget, onEdit }) {
           <TableRenderer
             data={rawData || data}
             selectedFields={widget.selectedFields}
-            apiType={widget.widgetType}
+            apiType={data?.type || detectApiType(rawData)}
           />
         );
       case 'chart':
@@ -155,7 +155,7 @@ export default function WidgetCard({ widget, onEdit }) {
           <ChartRenderer
             data={data}
             selectedFields={widget.selectedFields}
-            apiType={widget.widgetType}
+            apiType={data?.type || detectApiType(rawData)}
           />
         );
       default:

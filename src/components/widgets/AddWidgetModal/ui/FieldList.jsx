@@ -35,8 +35,12 @@ export default function FieldList({
             <button
               onClick={() => onAddField(field.path)}
               disabled={
+                // For table mode, only one array field can be selected (toggle)
                 displayMode === 'table'
                   ? selectedFields.length > 0 && selectedFields[0] === field.path
+                  // For card mode, arrays should not be selectable because they cannot map one-to-one
+                  : displayMode === 'card' && field.type === 'array'
+                  ? true
                   : selectedFields.includes(field.path)
               }
               className="ml-2 rounded bg-green-600 px-2 py-1 text-white hover:bg-green-700 disabled:opacity-50"
