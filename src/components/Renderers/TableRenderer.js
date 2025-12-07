@@ -6,6 +6,8 @@ import { getValueByPath } from '@/lib/extractJsonPaths';
 export default function TableRenderer({ data, selectedFields, apiType }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   if (!data) {
     return (
@@ -144,6 +146,17 @@ export default function TableRenderer({ data, selectedFields, apiType }) {
     return filtered;
   }, [tableData, searchQuery, sortConfig]);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(processedData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = processedData.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search or sort changes
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortConfig]);
+
   const handleSort = (columnKey) => {
     setSortConfig((prev) => {
       if (prev.key === columnKey) {
@@ -217,14 +230,14 @@ export default function TableRenderer({ data, selectedFields, apiType }) {
             </tr>
           </thead>
           <tbody>
-            {processedData.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-400">
                   No data found
                 </td>
               </tr>
             ) : (
-              processedData.map((item, index) => (
+              paginatedData.map((item, index) => (
                 <tr
                   key={index}
                   className="border-b border-gray-800 hover:bg-gray-800 transition-colors"
@@ -240,12 +253,72 @@ export default function TableRenderer({ data, selectedFields, apiType }) {
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination Controls */}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="text-xs text-gray-400">
+          Showing {startIndex + 1} to {Math.min(endIndex, processedData.length)} of {processedData.length} items
+          {arrayPath && (
+            <span className="ml-2 text-gray-500">(from: {arrayPath})</span>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+            title="First page"
+          >
+            {'<<'}
+          </button>
+          
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+          >
+            {'<'}
+          </button>
+          
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-gray-400">Page</span>
+            <input
+              type="number"
+              min="1"
+              max={totalPages}
+              value={currentPage}
+              onChange={(e) => {
+                const page = parseInt(e.target.value) || 1;
+                setCurrentPage(Math.min(Math.max(1, page), totalPages));
+              }}
+              className="w-12 rounded bg-gray-700 px-2 py-1 text-center text-xs text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <span className="text-xs text-gray-400">of {totalPages}</span>
+          </div>
+          
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+          >
+            {'>'}
+          </button>
+          
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+            title="Last page"
+          >
+            {'>>'}
+          </button>
+        </div>
+      </div>
       <div className="mt-2 text-right text-xs text-gray-400">
-        Showing {processedData.length} of {tableData.length} items
-        {arrayPath && (
-          <span className="ml-2 text-gray-500">(from: {arrayPath})</span>
-        )}
+        Total items: {tableData.length}
       </div>
     </div>
   );
 }
+
