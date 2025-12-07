@@ -1,5 +1,5 @@
-import SunIcon from '@/components/icons/SunIcon';
-import MoonIcon from '@/components/icons/MoonIcon';
+import SunIcon from '@/components/Icons/SunIcon';
+import MoonIcon from '@/components/Icons/MoonIcon';
 
 export default function ThemeToggle({ isDark, onToggle }) {
   return (
