@@ -6,48 +6,83 @@ import useWidgetStore from '@/store/widgetStore';
 const SAMPLE_DASHBOARD = {
   "widgets": [
     {
-      "id": "sample-chart-1",
-      "widgetName": "Bitcoin Daily Price",
-      "apiUrl": "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=SLQVSLJ82MPLG5O6P1Q7",
-      "displayMode": "chart",
-      "selectedFields": [
-        "volume"
-      ],
-      "refreshInterval": 3000,
-      "headers": []
-    },
-    {
-      "id": "sample-card-1",
-      "widgetName": "Crypto Rates",
+      "widgetName": "Crypto",
       "apiUrl": "https://api.coinbase.com/v2/exchange-rates?currency=BTC",
+      "refreshInterval": 30,
       "displayMode": "card",
       "selectedFields": [
         "data.currency",
         "data.rates.INR",
-        "data.rates.USD",
-        "data.rates.JPY"
+        "data.rates.PKR",
+        "data.rates.USD"
       ],
-      "refreshInterval": 30
+      "widgetType": "crypto-rates",
+      "id": "widget-1765012111102"
+    },
+    {
+      "widgetName": "Microsoft - monthly",
+      "apiUrl": "https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=MSFT&apikey=SLJ82MPLG5O6P1Q7",
+      "refreshInterval": 30002,
+      "displayMode": "chart",
+      "selectedFields": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+      ],
+      "widgetType": "time-series",
+      "id": "widget-1765013313861"
+    },
+    {
+      "widgetName": "top",
+      "apiUrl": "https://stock.indianapi.in/trending",
+      "refreshInterval": 3000,
+      "displayMode": "table",
+      "selectedFields": [
+        "trending_stocks.top_gainers"
+      ],
+      "widgetType": "generic-array",
+      "headers": [
+        {
+          "key": "X-Api-Key",
+          "value": "sk-live-r2kbLkDiS4dEpUPDgI9IPSnTu9FxVdlUMQzWkpSp"
+        }
+      ],
+      "id": "widget-1765091339763"
     }
   ],
   "layout": [
     {
-      "i": "sample-chart-1",
+      "w": 4,
+      "h": 5,
       "x": 0,
-      "y": 0,
-      "w": 6,
-      "h": 4,
-      "minW": 2,
-      "minH": 3
+      "y": 5,
+      "i": "widget-1765012111102",
+      "minW": 3,
+      "minH": 3,
+      "moved": false,
+      "static": false
     },
     {
-      "i": "sample-card-1",
-      "x": 6,
+      "w": 12,
+      "h": 5,
+      "x": 0,
       "y": 0,
-      "w": 6,
-      "h": 4,
-      "minW": 2,
-      "minH": 3
+      "i": "widget-1765013313861",
+      "minW": 3,
+      "minH": 3,
+      "moved": false,
+      "static": false
+    },
+    {
+      "w": 8,
+      "h": 5,
+      "x": 4,
+      "y": 5,
+      "i": "widget-1765091339763",
+      "moved": false,
+      "static": false
     }
   ]
 };
