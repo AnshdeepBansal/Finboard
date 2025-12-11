@@ -158,7 +158,7 @@ npm run format   # Code formatting
 | ----- | ---------------------------------- |
 | Card  | Works with any API structure       |
 | Table | API response must contain an array |
-| Chart | Only supports time-series APIs     |
+| Chart | Only supports Alhpavantage time-series APIs     |
 
 Charts auto-map:
 
@@ -167,6 +167,8 @@ Charts auto-map:
 * Low
 * Close
 * Volume
+
+You can use this api for charts - https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey={api_key}
 
 ---
 
